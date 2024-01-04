@@ -37,10 +37,10 @@
 
 #ifdef FW_DOWNLOAD_BY_SDIO
 #ifdef CONFIG_FW_LOADER
-#define BES2600_LOAD_BOOT_NAME      "best2002_fw_boot_sdio.bin"
-#define BES2600_LOAD_FW_NAME        "best2002_fw_sdio.bin"
-#define BES2600_LOAD_NOSIGNAL_FW_NAME   "best2002_fw_sdio_nosignal.bin"
-#define BES2600_LOAD_BTRF_FW_NAME   "best2002_fw_sdio_btrf.bin"
+#define BES2600_LOAD_BOOT_NAME      "bes2600/best2002_fw_boot_sdio.bin"
+#define BES2600_LOAD_FW_NAME        "bes2600/best2002_fw_sdio.bin"
+#define BES2600_LOAD_NOSIGNAL_FW_NAME   "bes2600/best2002_fw_sdio_nosignal.bin"
+#define BES2600_LOAD_BTRF_FW_NAME   "bes2600/best2002_fw_sdio_btrf.bin"
 #else
 #define BES2600_LOAD_BOOT_NAME      "/lib/firmware/best2002_fw_boot_sdio.bin"
 #define BES2600_LOAD_FW_NAME        "/lib/firmware/best2002_fw_sdio.bin"
@@ -55,10 +55,10 @@
 #endif
 
 #ifdef FW_DOWNLOAD_BY_USB
-#define BES2600_LOAD_BOOT_NAME      "best2002_fw_boot_usb.bin"
-#define BES2600_LOAD_FW_NAME        "best2002_fw_usb.bin"
-#define BES2600_LOAD_NOSIGNAL_FW_NAME   "best2002_fw_usb_nosignal.bin"
-#define BES2600_LOAD_BTRF_FW_NAME   "best2002_fw_usb_btrf.bin"
+#define BES2600_LOAD_BOOT_NAME      "bes2600/best2002_fw_boot_usb.bin"
+#define BES2600_LOAD_FW_NAME        "bes2600/best2002_fw_usb.bin"
+#define BES2600_LOAD_NOSIGNAL_FW_NAME   "bes2600/best2002_fw_usb_nosignal.bin"
+#define BES2600_LOAD_BTRF_FW_NAME   "bes2600/best2002_fw_usb_btrf.bin"
 #endif
 
 
