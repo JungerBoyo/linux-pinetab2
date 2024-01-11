@@ -443,11 +443,7 @@ void bes2600_txrx_opt_timer_restore(void)
 	}
 }
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,15,0)
 static void txrx_opt_timer_callback(struct timer_list* data)
-#else
-static void txrx_opt_timer_callback(unsigned long data)
-#endif
 {
 	bes2600_dbg(BES2600_DBG_TXRX, "####Timer callback function Called time = %lu\n", jiffies);
 	queue_work(txrx_hw_priv->workqueue, &txrx_hw_priv->dynamic_opt_txrx_work);
@@ -485,19 +481,11 @@ int bes2600_set_txrx_opt_default_param(struct bes2600_common * hw_priv)
 
 	if (priv->join_status == BES2600_JOIN_STATUS_STA) {
 		sta = ieee80211_find_sta(priv->vif, priv->vif->bss_conf.bssid);
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
 		if (sta->deflink.ht_cap.ht_supported &&
 		    ((priv->vif->bss_conf.chandef.width == NL80211_CHAN_WIDTH_20 &&
 			 sta->deflink.ht_cap.cap & IEEE80211_HT_CAP_SGI_20) ||
 			(priv->vif->bss_conf.chandef.width == NL80211_CHAN_WIDTH_40 &&
 			 sta->deflink.ht_cap.cap & IEEE80211_HT_CAP_SGI_40))) {
-#else
-		if (sta->ht_cap.ht_supported &&
-		    ((priv->vif->bss_conf.chandef.width == NL80211_CHAN_WIDTH_20 &&
-			 sta->ht_cap.cap & IEEE80211_HT_CAP_SGI_20) ||
-			(priv->vif->bss_conf.chandef.width == NL80211_CHAN_WIDTH_40 &&
-			 sta->ht_cap.cap & IEEE80211_HT_CAP_SGI_40))) {
-#endif
 			bes2600_info(BES2600_DBG_TXRX, "open short gi tx\n");
 			bes2600_enable_tx_shortgi(hw_priv, priv, 1);
 		} else {
@@ -547,13 +535,7 @@ int txrx_opt_timer_init(struct bes2600_vif *priv)
 	if (!txrx_hw_priv) {
 		txrx_hw_priv = hw_priv;
 		bes2600_info(BES2600_DBG_TXRX, "####Timer init hw_priv = %p\n", txrx_hw_priv);
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,14,0)
 		timer_setup(&hw_priv->txrx_opt_timer, txrx_opt_timer_callback, 0);
-#else
-		init_timer(&hw_priv->txrx_opt_timer);
-		hw_priv->txrx_opt_timer.function = txrx_opt_timer_callback;
-		hw_priv->txrx_opt_timer.data = 0;
-#endif
 		bes2600_set_txrx_opt_default_param(hw_priv);
 	}
 

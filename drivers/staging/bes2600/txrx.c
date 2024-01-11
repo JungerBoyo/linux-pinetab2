@@ -1193,10 +1193,8 @@ void bes2600_tx(struct ieee80211_hw *dev,
 		BUG_ON(bes2600_queue_put(&hw_priv->tx_queue[t.queue],
 				t.skb, &t.txpriv));
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 16, 0))
 		if (skb->sk)
 			sk_pacing_shift_update(skb->sk, 7);
-#endif
 
 		bes2600_dbg(BES2600_DBG_ROC, "QPUT %x, %pM, if_id - %d\n",
 			t.hdr->frame_control, t.da, priv->if_id);
@@ -1316,23 +1314,13 @@ void bes2600_tx_confirm_cb(struct bes2600_common *hw_priv,
 	} else if ((hw_priv->start_stop_tsm.start) &&
 		(arg->status == WSM_STATUS_SUCCESS)) {
 		if (queue_id == hw_priv->tsm_info.ac) {
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0)
 			struct timespec64 tmval;
 			ktime_get_real_ts64(&tmval);
-#else
-			struct timeval tmval;
-			do_gettimeofday(&tmval);
-#endif
 			pkt_delay = hw_priv->start_stop_tsm.packetization_delay;
 			if (hw_priv->tsm_info.sta_roamed &&
 			    !hw_priv->tsm_info.use_rx_roaming) {
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0)
 				hw_priv->tsm_info.roam_delay = tmval.tv_nsec / 1000 -
 				hw_priv->tsm_info.txconf_timestamp_vo;
-#else
-				hw_priv->tsm_info.roam_delay = tmval.tv_usec -
-				hw_priv->tsm_info.txconf_timestamp_vo;
-#endif
 				if (hw_priv->tsm_info.roam_delay > pkt_delay)
 					hw_priv->tsm_info.roam_delay -= pkt_delay;
 				bes2600_info(BES2600_DBG_TEST_MODE, "[TX] txConf"
@@ -1340,11 +1328,7 @@ void bes2600_tx_confirm_cb(struct bes2600_common *hw_priv,
 				hw_priv->tsm_info.roam_delay);
 				hw_priv->tsm_info.sta_roamed = 0;
 			}
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0)
 			hw_priv->tsm_info.rx_timestamp_vo = tmval.tv_nsec / 1000;
-#else
-			hw_priv->tsm_info.rx_timestamp_vo = tmval.tv_usec;
-#endif
 		}
 	}
 	spin_unlock_bh(&hw_priv->tsm_lock);
@@ -1615,20 +1599,12 @@ void bes2600_rx_cb(struct bes2600_vif *priv,
 	bool early_data = false;
 	size_t hdrlen = 0;
 	u64 tsf;
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 7, 0)
 	do {
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 6, 0)
-		struct timespec ts;
-		ts = ktime_to_timespec(ktime_get_boottime());
-		tsf = (u64)ts.tv_sec * 1000000000 + ts.tv_nsec;
-#else
 		struct timespec64 ts;
 		ts = ktime_to_timespec64(ktime_get_boottime());
 		tsf = (u64)ts.tv_sec * 1000000000 + ts.tv_nsec;
-#endif
 		hdr->boottime_ns = tsf;
 	} while (0);
-#endif
 
 	hdr->flag = 0;
 	if (unlikely(priv->mode == NL80211_IFTYPE_UNSPECIFIED)) {
@@ -1654,31 +1630,17 @@ void bes2600_rx_cb(struct bes2600_vif *priv,
 	if (hw_priv->start_stop_tsm.start) {
 		unsigned queue_id = skb_get_queue_mapping(skb);
 		if (queue_id == 0) {
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0)
 			struct timespec64 tmval;
 			ktime_get_real_ts64(&tmval);
-#else
-			struct timeval tmval;
-			do_gettimeofday(&tmval);
-#endif
 			if (hw_priv->tsm_info.sta_roamed &&
 				hw_priv->tsm_info.use_rx_roaming) {
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0)
 				hw_priv->tsm_info.roam_delay = tmval.tv_nsec / 1000 -
 					hw_priv->tsm_info.rx_timestamp_vo;
-#else
-				hw_priv->tsm_info.roam_delay = tmval.tv_usec -
-					hw_priv->tsm_info.rx_timestamp_vo;
-#endif
 				bes2600_dbg(BES2600_DBG_TEST_MODE, "[RX] RxInd Roaming:"
 				"roam_delay = %u\n", hw_priv->tsm_info.roam_delay);
 				hw_priv->tsm_info.sta_roamed = 0;
 			}
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0)
 			hw_priv->tsm_info.rx_timestamp_vo = tmval.tv_nsec / 1000;
-#else
-			hw_priv->tsm_info.rx_timestamp_vo = tmval.tv_usec;
-#endif
 		}
 	}
 	spin_unlock_bh(&hw_priv->tsm_lock);
@@ -1753,11 +1715,7 @@ void bes2600_rx_cb(struct bes2600_vif *priv,
 			hdr->band);
 
 	if (arg->rxedRate >= 14) {
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0))
 		hdr->encoding |= RX_ENC_HT;
-#else
-		hdr->flag |= RX_FLAG_HT;
-#endif
 		hdr->rate_idx = arg->rxedRate - 14;
 	} else if (arg->rxedRate >= 4) {
 		if (hdr->band == NL80211_BAND_5GHZ)

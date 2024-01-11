@@ -9,10 +9,7 @@
  * published by the Free Software Foundation.
  */
 
-/*Linux version 3.4.0 compilation*/
-//#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0))
-#include<linux/module.h>
-//#endif
+#include <linux/module.h>
 #include <linux/debugfs.h>
 #include <linux/seq_file.h>
 #include "bes2600.h"

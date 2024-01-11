@@ -340,11 +340,7 @@ void coex_set_wifi_conn(struct bes2600_common *hw_priv, uint8_t connect_status)
 		} else {
 			if (connect_status == EPTA_STATE_WIFI_CONNECTED) {
 				// set bt bad channel according to wifi channel
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,7,0)
 				if (hw_priv->channel->band == NL80211_BAND_2GHZ)
-#else
-				if (hw_priv->channel->band == IEEE80211_BAND_2GHZ)
-#endif
 					wsm_epta_wifi_chan_cmd(hw_priv, hw_priv->channel->hw_value, hw_priv->ht_info.channel_type);
 			} else if (connect_status == EPTA_STATE_WIFI_DISCONNECTED) {
 				coex_epta_recover(hw_priv, EPTA_FREEZE_ALL); // wifi disconect need to recover all requests

@@ -2634,11 +2634,7 @@ static bool wsm_handle_tx_data(struct bes2600_vif *priv,
 		hw_priv->pending_frame_id = __le32_to_cpu(wsm->packetID);
 
 #ifdef WIFI_BT_COEXIST_EPTA_ENABLE
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,7,0)
 		if (hw_priv->channel->band != NL80211_BAND_2GHZ)
-#else
-		if (hw_priv->channel->band != IEEE80211_BAND_2GHZ)
-#endif
 			bwifi_change_current_status(hw_priv, BWIFI_STATUS_CONNECTING_5G);
 		else
 			bwifi_change_current_status(hw_priv, BWIFI_STATUS_CONNECTING);
@@ -2740,11 +2736,7 @@ static int bes2600_get_prio_queue(struct bes2600_vif *priv,
 		edca = &priv->edca.params[i];
 		score = ((edca->aifns + edca->cwMin) << 16) +
 				(edca->cwMax - edca->cwMin) *
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
 				(get_random_u32() & 0xFFFF);
-#else
-				(get_random_int() & 0xFFFF);
-#endif
 		if (score < best && (winner < 0 || i != 3)) {
 			best = score;
 			winner = i;

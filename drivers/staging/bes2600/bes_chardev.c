@@ -733,11 +733,7 @@ static int bes2600_chrdev_write_dpd_data_to_file(const char *path, void *buffer,
 		return -1;
 	}
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,14,0))
 	ret = kernel_write(fp, buffer, size, &fp->f_pos);
-#else
-	ret = kernel_write(fp, buffer, size, fp->f_pos);
-#endif
 	bes2600_err_with_cond(ret < 0, BES2600_DBG_CHARDEV, "write dpd to file failed\n");
 
 	filp_close(fp,NULL);
@@ -803,11 +799,7 @@ static int bes2600_chrdev_read_and_check_dpd_data(const char *file, u8 **data, u
 	}
 
 	/* read data  from file */
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,14,0))
 	ret = kernel_read(fp, read_data, fp->f_inode->i_size, &fp->f_pos);
-#else
-	ret = kernel_read(fp, fp->f_pos, read_data, fp->f_inode->i_size);
-#endif
 	if (ret < DPD_BIN_SIZE) {
 		bes2600_err(BES2600_DBG_CHARDEV, "%s read fail, ret=%d\n", __func__, ret);
 		goto err2;
@@ -1274,11 +1266,7 @@ int bes2600_chrdev_init(struct sbus_ops *ops)
 	}
 
 	/* create class for creating device node */
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
 	bes2600_cdev.class = class_create("bes2600_chrdev");
-#else
-	bes2600_cdev.class = class_create(THIS_MODULE, "bes2600_chrdev");
-#endif
 	if (IS_ERR(bes2600_cdev.class)){
 		bes2600_err(BES2600_DBG_CHARDEV, "bes2600 char device add fail\n");
 		ret = -EFAULT;

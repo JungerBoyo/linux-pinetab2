@@ -514,11 +514,7 @@ retry:
 		ret = -ENOMEM;
 		goto close_fp;
 	}
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,14,0))
 	ret = kernel_read(my_fwp, fw_bin->data, fw_bin->size, &my_fwp->f_pos);
-#else
-	ret = kernel_read(my_fwp, my_fwp->f_pos, fw_bin->data, fw_bin->size);
-#endif
 	if (ret != fw_bin->size) {
 		bes2600_err(BES2600_DBG_DOWNLOAD, "read firmware size error:%d,%lu.\n", ret, (long unsigned)fw_bin->size);
 		ret = -EIO;

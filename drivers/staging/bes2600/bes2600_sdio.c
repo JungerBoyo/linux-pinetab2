@@ -365,22 +365,6 @@ out:
 }
 #endif
 
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4,19,56))
-static void sdio_retune_hold_now(struct sdio_func *func)
-{
-	func->card->host->retune_now = 0;
-	func->card->host->hold_retune += 1;
-}
-
-static void sdio_retune_release(struct sdio_func *func)
-{
-	if (func->card->host->hold_retune)
-		func->card->host->hold_retune -= 1;
-	else
-		WARN_ON(1);
-}
-#endif
-
 static int bes2600_sdio_memcpy_fromio(struct sbus_priv *self,
 				     unsigned int addr,
 				     void *dst, int count)

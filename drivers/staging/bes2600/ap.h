@@ -26,11 +26,7 @@ void bes2600_sta_notify(struct ieee80211_hw *dev, struct ieee80211_vif *vif,
 void bes2600_bss_info_changed(struct ieee80211_hw *dev,
 			     struct ieee80211_vif *vif,
 			     struct ieee80211_bss_conf *info,
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0)
 			     u64 changed);
-#else
-			     u32 changed);
-#endif
 
 int bes2600_ampdu_action(struct ieee80211_hw *hw,
 			struct ieee80211_vif *vif,
@@ -42,11 +38,7 @@ void bes2600_set_tim_work(struct work_struct *work);
 void bes2600_set_cts_work(struct work_struct *work);
 void bes2600_multicast_start_work(struct work_struct *work);
 void bes2600_multicast_stop_work(struct work_struct *work);
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0))
 void bes2600_mcast_timeout(struct timer_list *t);
-#else
-void bes2600_mcast_timeout(unsigned long arg);
-#endif
 int bes2600_find_link_id(struct bes2600_vif *priv, const u8 *mac);
 int bes2600_alloc_link_id(struct bes2600_vif *priv, const u8 *mac);
 void bes2600_link_id_work(struct work_struct *work);
