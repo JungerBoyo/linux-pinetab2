@@ -193,7 +193,7 @@ static void __bes2600_queue_gc(struct bes2600_queue *queue,
 		}
 	}
 }
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0))
+
 static void bes2600_queue_gc(struct timer_list *t)
 {
 	LIST_HEAD(list);
@@ -204,18 +204,6 @@ static void bes2600_queue_gc(struct timer_list *t)
 	spin_unlock_bh(&queue->lock);
 	bes2600_queue_post_gc(queue->stats, &list);
 }
-#else
-static void bes2600_queue_gc(unsigned long arg)
-{
-	LIST_HEAD(list);
-	struct bes2600_queue *queue = (struct bes2600_queue *)arg;
-
-	spin_lock_bh(&queue->lock);
-	__bes2600_queue_gc(queue, &list, true);
-	spin_unlock_bh(&queue->lock);
-	bes2600_queue_post_gc(queue->stats, &list);
-}
-#endif
 
 int bes2600_queue_stats_init(struct bes2600_queue_stats *stats,
 			    size_t map_capacity,
@@ -261,11 +249,7 @@ int bes2600_queue_init(struct bes2600_queue *queue,
 	INIT_LIST_HEAD(&queue->free_pool);
 	queue->queue_all_lock = false;
 	spin_lock_init(&queue->lock);
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0))
 	timer_setup(&queue->gc, bes2600_queue_gc, 0);
-#else
-	setup_timer(&queue->gc, bes2600_queue_gc,(unsigned long)queue);
-#endif
 	queue->pool = kzalloc(sizeof(struct bes2600_queue_item) * capacity,
 			GFP_KERNEL);
 	if (!queue->pool)
@@ -424,11 +408,7 @@ int bes2600_queue_put(struct bes2600_queue *queue,
 {
 	int ret = 0;
 #ifdef CONFIG_BES2600_TESTMODE
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0)
 	struct timespec64 tmval;
-#else
-	struct timeval tmval;
-#endif
 #endif /*CONFIG_BES2600_TESTMODE*/
 
 	LIST_HEAD(gc_list);
@@ -461,13 +441,8 @@ int bes2600_queue_put(struct bes2600_queue *queue,
 		}
 #endif
 #ifdef CONFIG_BES2600_TESTMODE
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0)
 		ktime_get_real_ts64(&tmval);
 		item->qdelay_timestamp = tmval.tv_nsec / 1000;
-#else
-		do_gettimeofday(&tmval);
-		item->qdelay_timestamp = tmval.tv_usec;
-#endif
 #endif /*CONFIG_BES2600_TESTMODE*/
 
 		++queue->num_queued;
@@ -522,11 +497,7 @@ int bes2600_queue_get(struct bes2600_queue *queue,
 	struct bes2600_queue_stats *stats = queue->stats;
 	bool wakeup_stats = false;
 #ifdef CONFIG_BES2600_TESTMODE
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0)
 	struct timespec64 tmval;
-#else
-	struct timeval tmval;
-#endif
 #endif /*CONFIG_BES2600_TESTMODE*/
 
 	spin_lock_bh(&queue->lock);
@@ -550,13 +521,8 @@ int bes2600_queue_get(struct bes2600_queue *queue,
 				[item->txpriv.link_id];
 		item->xmit_timestamp = jiffies;
 #ifdef CONFIG_BES2600_TESTMODE
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0)
 		ktime_get_real_ts64(&tmval);
 		item->mdelay_timestamp = tmval.tv_nsec / 1000;
-#else
-		do_gettimeofday(&tmval);
-		item->mdelay_timestamp = tmval.tv_usec;
-#endif
 #endif /*CONFIG_BES2600_TESTMODE*/
 
 		spin_lock_bh(&stats->lock);
@@ -800,14 +766,9 @@ int bes2600_queue_remove(struct bes2600_queue *queue, u32 packetID)
 		spin_lock_bh(&hw_priv->tsm_lock);
 		if (hw_priv->start_stop_tsm.start) {
 			if (queue_id == hw_priv->tsm_info.ac) {
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0)
 				struct timespec64 tmval;
-#else
-				struct timeval tmval;
-#endif
 				unsigned long queue_delay;
 				unsigned long media_delay;
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0)
 				ktime_get_real_ts64(&tmval);
 
 				if (tmval.tv_nsec / 1000 > item->qdelay_timestamp)
@@ -823,23 +784,6 @@ int bes2600_queue_remove(struct bes2600_queue *queue, u32 packetID)
 				else
 					media_delay = tmval.tv_nsec / 1000 +
 					1000000 - item->mdelay_timestamp;
-#else
-				do_gettimeofday(&tmval);
-
-				if (tmval.tv_usec > item->qdelay_timestamp)
-					queue_delay = tmval.tv_usec -
-						item->qdelay_timestamp;
-				else
-					queue_delay = tmval.tv_usec +
-					1000000 - item->qdelay_timestamp;
-
-				if (tmval.tv_usec > item->mdelay_timestamp)
-					media_delay = tmval.tv_usec -
-						item->mdelay_timestamp;
-				else
-					media_delay = tmval.tv_usec +
-					1000000 - item->mdelay_timestamp;
-#endif
 				hw_priv->tsm_info.sum_media_delay +=
 							media_delay;
 				hw_priv->tsm_info.sum_pkt_q_delay += queue_delay;

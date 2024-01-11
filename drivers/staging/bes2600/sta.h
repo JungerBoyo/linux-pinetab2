@@ -36,9 +36,7 @@ void bes2600_configure_filter(struct ieee80211_hw *dev,
 			     unsigned int *total_flags,
 			     u64 multicast);
 int bes2600_conf_tx(struct ieee80211_hw *dev, struct ieee80211_vif *vif,
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0)
 		unsigned int link_id,
-#endif
 		u16 queue, const struct ieee80211_tx_queue_params *params);
 int bes2600_get_stats(struct ieee80211_hw *dev,
 		     struct ieee80211_low_level_stats *stats);
@@ -62,9 +60,7 @@ int bes2600_remain_on_channel(struct ieee80211_hw *hw,
 				 enum ieee80211_roc_type type);
 
 int bes2600_cancel_remain_on_channel(struct ieee80211_hw *hw
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 0)
 	, struct ieee80211_vif *vif
-#endif
 	);
 
 int bes2600_set_arpreply(struct ieee80211_hw *hw, struct ieee80211_vif *vif);
@@ -117,11 +113,7 @@ int bes2600_disable_listening(struct bes2600_vif *priv);
 int bes2600_set_uapsd_param(struct bes2600_vif *priv,
 				const struct wsm_edca_params *arg);
 void bes2600_ba_work(struct work_struct *work);
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0))
 void bes2600_ba_timer(struct timer_list *t);
-#else
-void bes2600_ba_timer(unsigned long arg);
-#endif
 const u8 *bes2600_get_ie(u8 *start, size_t len, u8 ie);
 int bes2600_vif_setup(struct bes2600_vif *priv);
 int bes2600_setup_mac_pvif(struct bes2600_vif *priv);

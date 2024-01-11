@@ -9,10 +9,7 @@
  * published by the Free Software Foundation.
  */
 
-/*Linux version 3.4.0 compilation*/
-//#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0))
-#include<linux/module.h>
-//#endif
+#include <linux/module.h>
 #include <linux/init.h>
 #include <linux/firmware.h>
 #include <linux/etherdevice.h>
@@ -46,9 +43,7 @@ MODULE_AUTHOR("Dmitry Tarnyagin <dmitry.tarnyagin@stericsson.com>");
 MODULE_DESCRIPTION("Softmac BES2600 common code");
 MODULE_LICENSE("GPL");
 MODULE_ALIAS("bes2600");
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 0)
 MODULE_IMPORT_NS(VFS_internal_I_am_really_a_filesystem_and_am_NOT_a_driver);
-#endif
 
 static u8 bes2600_mac_template[ETH_ALEN] = {
 #if (GET_MAC_ADDR_METHOD == 2)||(GET_MAC_ADDR_METHOD == 3)
@@ -516,11 +511,7 @@ struct ieee80211_hw *bes2600_init_common(size_t hw_priv_data_len)
 #endif /* CONFIG_BES2600_5GHZ_SUPPORT */
 
 	/* Channel params have to be cleared before registering wiphy again */
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,7,0)
 	for (band = 0; band < NUM_NL80211_BANDS; band++) {
-#else
-	for (band = 0; band < IEEE80211_NUM_BANDS; band++) {
-#endif
 		sband = hw->wiphy->bands[band];
 		if (!sband)
 			continue;
@@ -574,11 +565,7 @@ struct ieee80211_hw *bes2600_init_common(size_t hw_priv_data_len)
 	INIT_WORK(&hw_priv->event_handler, bes2600_event_handler);
 	INIT_WORK(&hw_priv->ba_work, bes2600_ba_work);
 	spin_lock_init(&hw_priv->ba_lock);
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0))
 	timer_setup(&hw_priv->ba_timer, bes2600_ba_timer, 0);
-#else
-	setup_timer(&hw_priv->ba_timer, bes2600_ba_timer, (unsigned long)hw_priv);
-#endif
 
 	if (unlikely(bes2600_queue_stats_init(&hw_priv->tx_queue_stats,
 			WLAN_LINK_ID_MAX,
@@ -607,13 +594,8 @@ struct ieee80211_hw *bes2600_init_common(size_t hw_priv_data_len)
 	hw_priv->offchannel_done = 0;
 	wsm_buf_init(&hw_priv->wsm_cmd_buf);
 	spin_lock_init(&hw_priv->wsm_cmd.lock);
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0))
 	timer_setup(&hw_priv->mcu_mon_timer, bes2600_bh_mcu_active_monitor, 0);
 	timer_setup(&hw_priv->lmac_mon_timer, bes2600_bh_lmac_active_monitor, 0);
-#else
-	setup_timer(&hw_priv->mcu_mon_timer, bes2600_bh_mcu_active_monitor,(unsigned long)hw_priv);
-	setup_timer(&hw_priv->lmac_mon_timer, bes2600_bh_lmac_active_monitor,(unsigned long)hw_priv);
-#endif
 
 	bes2600_tx_loop_init(hw_priv);
 

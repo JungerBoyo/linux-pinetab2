@@ -42,12 +42,7 @@ int bes2600_bh_sw_process(struct bes2600_common *hw_priv,
 void bes2600_bh_inc_pending_count(struct bes2600_common *hw_priv, int idx);
 void bes2600_bh_dec_pending_count(struct bes2600_common *hw_priv, int idx);
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,15,0)
 void bes2600_bh_mcu_active_monitor(struct timer_list* t);
 void bes2600_bh_lmac_active_monitor(struct timer_list* t);
-#else
-void bes2600_bh_mcu_active_monitor(unsigned long data);
-void bes2600_bh_lmac_active_monitor(unsigned long data);
-#endif
 
 #endif /* BES2600_BH_H */

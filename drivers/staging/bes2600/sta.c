@@ -546,11 +546,7 @@ int bes2600_config(struct ieee80211_hw *dev, u32 changed)
 		bes2600_info(BES2600_DBG_STA, "Output power --%d\n",hw_priv->output_power);
 #ifdef CONFIG_BES2600_TESTMODE
 		/* Testing if Power Level to set is out of device power range */
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,7,0)
 		if (conf->chandef.chan->band == NL80211_BAND_2GHZ) {
-#else
-		if (conf->chandef.chan->band == IEEE80211_BAND_2GHZ) {
-#endif
 			max_power_level = hw_priv->txPowerRange[0].max_power_level;
 			min_power_level = hw_priv->txPowerRange[0].min_power_level;
 		} else {
@@ -803,9 +799,7 @@ void bes2600_configure_filter(struct ieee80211_hw *hw,
 }
 
 int bes2600_conf_tx(struct ieee80211_hw *dev, struct ieee80211_vif *vif,
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0)
 		unsigned int link_id,
-#endif
 		u16 queue, const struct ieee80211_tx_queue_params *params)
 {
 	struct bes2600_common *hw_priv = dev->priv;
@@ -1333,9 +1327,7 @@ int bes2600_remain_on_channel(struct ieee80211_hw *hw,
 }
 
 int bes2600_cancel_remain_on_channel(struct ieee80211_hw *hw
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 0)
 	, struct ieee80211_vif *vif
-#endif
 	)
 {
 	struct bes2600_common *hw_priv = hw->priv;
@@ -1458,11 +1450,7 @@ void bes2600_event_handler(struct work_struct *work)
 					NL80211_CQM_RSSI_THRESHOLD_EVENT_LOW :
 					NL80211_CQM_RSSI_THRESHOLD_EVENT_HIGH;
 				bes2600_info(BES2600_DBG_STA, "[CQM] RSSI event: %d.\n", rcpi_rssi);
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0))
 				ieee80211_cqm_rssi_notify(priv->vif, cqm_evt, rcpi_rssi, GFP_KERNEL);
-#else
-				ieee80211_cqm_rssi_notify(priv->vif, cqm_evt, GFP_KERNEL);
-#endif
 				break;
 			}
 			case WSM_EVENT_BT_INACTIVE:
@@ -1556,11 +1544,7 @@ void bes2600_bss_loss_work(struct work_struct *work)
 
 	spin_lock(&priv->bss_loss_lock);
 #ifdef BSS_LOSS_CHECK
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,3,0))
 	if (!priv->vif->cfg.assoc) {
-#else
-	if (!priv->vif->bss_conf.assoc) {
-#endif
 		priv->bss_loss_status = BES2600_BSS_LOSS_NONE;
 		spin_unlock(&priv->bss_loss_lock);
 		bl_ck_cnt = 0;
@@ -1575,13 +1559,7 @@ void bes2600_bss_loss_work(struct work_struct *work)
 		priv->cmq_tx_success_count = 0;
 		bl_ck_cnt = 0;
 		bl_cfm_cnt = 0;
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,3,0))
 		skb = ieee80211_nullfunc_get(priv->hw, priv->vif, 0, false);
-#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0))
-		skb = ieee80211_nullfunc_get(priv->hw, priv->vif, false);
-#else
-		skb = ieee80211_nullfunc_get(priv->hw, priv->vif);
-#endif
 		if (!(WARN_ON(!skb))) {
 			info = IEEE80211_SKB_CB(skb);
 			info->control.vif = priv->vif;
@@ -1607,13 +1585,7 @@ void bes2600_bss_loss_work(struct work_struct *work)
 		if (bl_ck_cnt++ < BSS_LOSS_CK_THR) {
 			spin_unlock(&priv->bss_loss_lock);
 			priv->bss_loss_status = BES2600_BSS_LOSS_CHECKING;
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,3,0))
 			skb = ieee80211_nullfunc_get(priv->hw, priv->vif, 0, false);
-#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0))
-			skb = ieee80211_nullfunc_get(priv->hw, priv->vif, false);
-#else
-			skb = ieee80211_nullfunc_get(priv->hw, priv->vif);
-#endif
 			if (!(WARN_ON(!skb))) {
 				info = IEEE80211_SKB_CB(skb);
 				info->control.vif = priv->vif;
@@ -1645,13 +1617,7 @@ void bes2600_bss_loss_work(struct work_struct *work)
 		if (bl_cfm_cnt++ < BSS_LOSS_CFM_THR) {
 			spin_unlock(&priv->bss_loss_lock);
 			priv->bss_loss_status = BES2600_BSS_LOSS_CHECKING;
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,3,0))
 			skb = ieee80211_nullfunc_get(priv->hw, priv->vif, 0, false);
-#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0))
-			skb = ieee80211_nullfunc_get(priv->hw, priv->vif, false);
-#else
-			skb = ieee80211_nullfunc_get(priv->hw, priv->vif);
-#endif
 			if (!(WARN_ON(!skb))) {
 				info = IEEE80211_SKB_CB(skb);
 				info->control.vif = priv->vif;
@@ -2258,11 +2224,7 @@ void bes2600_join_work(struct work_struct *work)
 
 		/* basicRateSet will be updated after association.
 		Currently these values are hardcoded */
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,7,0)
 		if (hw_priv->channel->band == NL80211_BAND_5GHZ) {
-#else
-		if (hw_priv->channel->band == IEEE80211_BAND_5GHZ) {
-#endif
 			join.band = WSM_PHY_BAND_5G;
 			join.basicRateSet = 64; /*6 mbps*/
 		}else{
@@ -2502,11 +2464,7 @@ int bes2600_enable_listening(struct bes2600_vif *priv,
 #else
 		.mode = WSM_START_MODE_P2P_DEV | (priv->if_id << 4),
 #endif
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,7,0)
 		.band = (chan->band == NL80211_BAND_5GHZ) ?
-#else
-		.band = (chan->band == IEEE80211_BAND_5GHZ) ?
-#endif
 				WSM_PHY_BAND_5G : WSM_PHY_BAND_2_4G,
 		.channelNumber = chan->hw_value,
 		.beaconInterval = 100,
@@ -2611,7 +2569,7 @@ void bes2600_ba_work(struct work_struct *work)
 
 	wsm_unlock_tx(hw_priv);
 }
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0))
+
 void bes2600_ba_timer(struct timer_list *t)
 {
 	bool ba_ena;
@@ -2660,55 +2618,6 @@ skip_statistic_update:
 	spin_unlock_bh(&hw_priv->ba_lock);
 }
 
-#else
-void bes2600_ba_timer(unsigned long arg)
-{
-	bool ba_ena;
-	struct bes2600_common *hw_priv = (struct bes2600_common *)arg;
-
-	spin_lock_bh(&hw_priv->ba_lock);
-	bes2600_debug_ba(hw_priv, hw_priv->ba_cnt, hw_priv->ba_acc,
-			hw_priv->ba_cnt_rx, hw_priv->ba_acc_rx);
-
-	if (atomic_read(&hw_priv->scan.in_progress)) {
-		hw_priv->ba_cnt = 0;
-		hw_priv->ba_acc = 0;
-		hw_priv->ba_cnt_rx = 0;
-		hw_priv->ba_acc_rx = 0;
-		goto skip_statistic_update;
-	}
-
-	if (hw_priv->ba_cnt >= BES2600_BLOCK_ACK_CNT &&
-		(hw_priv->ba_acc / hw_priv->ba_cnt >= BES2600_BLOCK_ACK_THLD ||
-		(hw_priv->ba_cnt_rx >= BES2600_BLOCK_ACK_CNT &&
-		hw_priv->ba_acc_rx / hw_priv->ba_cnt_rx >=
-			BES2600_BLOCK_ACK_THLD)))
-		ba_ena = true;
-	else
-		ba_ena = false;
-
-	hw_priv->ba_cnt = 0;
-	hw_priv->ba_acc = 0;
-	hw_priv->ba_cnt_rx = 0;
-	hw_priv->ba_acc_rx = 0;
-
-	if (ba_ena != hw_priv->ba_ena) {
-		if (ba_ena || ++hw_priv->ba_hist >= BES2600_BLOCK_ACK_HIST) {
-			hw_priv->ba_ena = ba_ena;
-			hw_priv->ba_hist = 0;
-#if 0
-			bes2600_dbg(BES2600_DBG_STA, "[STA] %s block ACK:\n",
-				ba_ena ? "enable" : "disable");
-			queue_work(hw_priv->workqueue, &hw_priv->ba_work);
-#endif
-		}
-	} else if (hw_priv->ba_hist)
-		--hw_priv->ba_hist;
-
-skip_statistic_update:
-	spin_unlock_bh(&hw_priv->ba_lock);
-}
-#endif
 int bes2600_vif_setup(struct bes2600_vif *priv)
 {
 	struct bes2600_common *hw_priv = priv->hw_priv;
@@ -2744,11 +2653,7 @@ int bes2600_vif_setup(struct bes2600_vif *priv)
 #ifdef AP_HT_CAP_UPDATE
         INIT_WORK(&priv->ht_info_update_work, bes2600_ht_info_update_work);
 #endif
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0))
 	timer_setup(&priv->mcast_timeout, bes2600_mcast_timeout, 0);
-#else
-	setup_timer(&priv->mcast_timeout, bes2600_mcast_timeout, (unsigned long)priv);
-#endif
 
 	priv->setbssparams_done = false;
 	priv->power_set_true = 0;

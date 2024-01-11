@@ -211,11 +211,7 @@ int bes2600_hw_scan(struct ieee80211_hw *hw,
 		return -ENOMEM;
 
 	if (req->ie_len)
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0))
 		skb_put_data(frame.skb, req->ie, req->ie_len);
-#else
-		memcpy(skb_put(frame.skb, req->ie_len), req->ie, req->ie_len);
-#endif
 
 	/* will be unlocked in bes2600_scan_work() */
 	down(&hw_priv->scan.lock);
@@ -488,13 +484,9 @@ void bes2600_scan_work(struct work_struct *work)
 	}
 
 	if (!hw_priv->scan.req || (hw_priv->scan.curr == hw_priv->scan.end)) {
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,8,0)
 		struct cfg80211_scan_info info = {
 			.aborted = hw_priv->scan.status ? 1 : 0,
 		};
-#else
-		bool aborted = hw_priv->scan.status ? true : false;
-#endif
 
 #ifdef CONFIG_BES2600_TESTMODE
 		if (hw_priv->enable_advance_scan &&
@@ -549,11 +541,7 @@ void bes2600_scan_work(struct work_struct *work)
 
 #ifdef WIFI_BT_COEXIST_EPTA_ENABLE
 		if (priv->join_status == BES2600_JOIN_STATUS_STA) {
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,7,0)
 			if (hw_priv->channel->band != NL80211_BAND_2GHZ)
-#else
-			if (hw_priv->channel->band != IEEE80211_BAND_2GHZ)
-#endif
 				bwifi_change_current_status(hw_priv, BWIFI_STATUS_GOT_IP_5G);
 			else
 				bwifi_change_current_status(hw_priv, BWIFI_STATUS_GOT_IP);
@@ -581,11 +569,7 @@ void bes2600_scan_work(struct work_struct *work)
 		wsm_unlock_tx(hw_priv);
 		up(&hw_priv->conf_lock);
 		bes2600_pwr_clear_busy_event(hw_priv, BES_PWR_LOCK_ON_SCAN);
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,8,0)
 		ieee80211_scan_completed(hw_priv->hw, &info);
-#else
-		ieee80211_scan_completed(hw_priv->hw, aborted);
-#endif
 		up(&hw_priv->scan.lock);
 		return;
 	} else {
@@ -979,13 +963,9 @@ void bes2600_advance_scan_timeout(struct work_struct *work)
 		 * Timer Expire */
 		bes2600_scan_complete(hw_priv, hw_priv->scan.if_id);
 	} else {
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,8,0)
 		struct cfg80211_scan_info info = {
 			.aborted = hw_priv->scan.status ? 1 : 0,
 		};
-#else
-		bool aborted = hw_priv->scan.status ? true : false;
-#endif
 		/* Active Scan on Serving Channel
 		 * Timer Expire */
 		down(&hw_priv->conf_lock);
@@ -1001,11 +981,7 @@ void bes2600_advance_scan_timeout(struct work_struct *work)
 		hw_priv->enable_advance_scan = false;
 		wsm_unlock_tx(hw_priv);
 		up(&hw_priv->conf_lock);
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,8,0)
 		ieee80211_scan_completed(hw_priv->hw, &info);
-#else
-		ieee80211_scan_completed(hw_priv->hw, aborted);
-#endif
 		up(&hw_priv->scan.lock);
 	}
 }
@@ -1093,11 +1069,7 @@ void bes2600_probe_work(struct work_struct *work)
 	}
 	wsm = (struct wsm_tx *)frame.skb->data;
 	scan.maxTransmitRate = wsm->maxTxRate;
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,7,0)
 	scan.band = (hw_priv->channel->band == NL80211_BAND_5GHZ) ?
-#else
-	scan.band = (hw_priv->channel->band == IEEE80211_BAND_5GHZ) ?
-#endif
 		WSM_PHY_BAND_5G : WSM_PHY_BAND_2_4G;
 	if (priv->join_status == BES2600_JOIN_STATUS_STA) {
 		scan.scanType = WSM_SCAN_TYPE_BACKGROUND;

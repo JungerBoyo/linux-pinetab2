@@ -161,11 +161,7 @@ static int factory_section_read_file(char *path, void *buffer)
 		return -1;
 	}
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,14,0))
 	ret = kernel_read(fp, buffer, fp->f_inode->i_size, &fp->f_pos);
-#else
-	ret = kernel_read(fp, fp->f_pos, buffer, fp->f_inode->i_size);
-#endif
 
 	filp_close(fp, NULL);
 
@@ -197,11 +193,8 @@ static int factory_section_write_file(char *path, void *buffer, int size)
 		bes2600_info(BES2600_DBG_FACTORY, "BES2600 : can't open %s\n",path);
 		return -1;
 	}
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,14,0))
+
 	ret = kernel_write(fp, buffer, size, &fp->f_pos);
-#else
-	ret = kernel_write(fp, buffer, size, fp->f_pos);
-#endif
 
 	filp_close(fp,NULL);
 

@@ -14,9 +14,7 @@
 #include "ap.h"
 #include "bh.h"
 #include "net/mac80211.h"
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0))
 #include <linux/umh.h>
-#endif
 #include "epta_request.h"
 #include "epta_coex.h"
 #include "txrx_opt.h"
@@ -248,13 +246,8 @@ static int bes2600_set_tim_impl(struct bes2600_vif *priv, bool aid0_bit_set)
 
 	bes2600_dbg(BES2600_DBG_AP, "[AP] %s mcast: %s.\n",
 		__func__, aid0_bit_set ? "ena" : "dis");
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,3,0))
 	skb = ieee80211_beacon_get_tim(priv->hw, priv->vif,
 			&tim_offset, &tim_length, 0);
-#else
-	skb = ieee80211_beacon_get_tim(priv->hw, priv->vif,
-			&tim_offset, &tim_length);
-#endif
 	if (!skb) {
 		if (!__bes2600_flush(hw_priv, true, priv->if_id))
 			wsm_unlock_tx(hw_priv);
@@ -397,31 +390,19 @@ static int bes2600_set_btcoexinfo(struct bes2600_vif *priv)
 void bes2600_bss_info_changed(struct ieee80211_hw *dev,
 			     struct ieee80211_vif *vif,
 			     struct ieee80211_bss_conf *info,
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0)
 			     u64 changed)
-#else
-			     u32 changed)
-#endif
 {
 	struct bes2600_common *hw_priv = dev->priv;
 	struct bes2600_vif *priv = cw12xx_get_vif_from_ieee80211(vif);
 	struct ieee80211_conf *conf = &dev->conf;
 	const u8 override_fpsm_timeout = BES2600_FASTPS_IDLE_TIME;
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
 	struct ieee80211_vif_cfg *cfg = &vif->cfg;
-#else
-	struct ieee80211_bss_conf *cfg = info,
-#endif
 
 #ifdef P2P_MULTIVIF
 	if (priv->if_id == CW12XX_GENERIC_IF_ID)
 		return;
 #endif
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0)
 	bes2600_info(BES2600_DBG_AP, "BSS CHANGED:	%08llx\n", changed);
-#else
-	bes2600_info(BES2600_DBG_AP, "BSS CHANGED:	%08x\n", changed);
-#endif
 	down(&hw_priv->conf_lock);
 	if (changed & BSS_CHANGED_BSSID) {
 #ifdef CONFIG_BES2600_TESTMODE
@@ -671,20 +652,11 @@ void bes2600_bss_info_changed(struct ieee80211_hw *dev,
 				* mac80211 changes are available */
 				enum nl80211_channel_type ch_type;
 				BUG_ON(!hw_priv->channel);
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
 				hw_priv->ht_info.ht_cap = sta->deflink.ht_cap;
-#else
-				hw_priv->ht_info.ht_cap = sta->ht_cap;
-#endif
 				priv->bss_params.operationalRateSet =
 					__cpu_to_le32(
 					bes2600_rate_mask_to_wsm(hw_priv,
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
-					sta->deflink.supp_rates[
-#else
-					sta->supp_rates[
-#endif
-						hw_priv->channel->band]));
+					sta->deflink.supp_rates[hw_priv->channel->band]));
 				rcu_read_unlock();
 				ch_type = cfg80211_get_chandef_type(&info->chandef);
 				bes2600_dbg(BES2600_DBG_AP, "[STA] ch %d, type: %d, HT oper mode: %d\n",
@@ -706,11 +678,7 @@ void bes2600_bss_info_changed(struct ieee80211_hw *dev,
 
 #ifdef WIFI_BT_COEXIST_EPTA_ENABLE
 				if (changed & BSS_CHANGED_ASSOC) {
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,7,0)
 					if (hw_priv->channel->band != NL80211_BAND_2GHZ)
-#else
-					if (hw_priv->channel->band != IEEE80211_BAND_2GHZ)
-#endif
 						bwifi_change_current_status(hw_priv, BWIFI_STATUS_CONNECTED_5G);
 					else
 						bwifi_change_current_status(hw_priv, BWIFI_STATUS_CONNECTED);
@@ -1195,7 +1163,6 @@ void bes2600_multicast_stop_work(struct work_struct *work)
 	}
 }
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0))
 void bes2600_mcast_timeout(struct timer_list *t)
 {
 	struct bes2600_vif *priv = from_timer(priv, t, mcast_timeout);
@@ -1209,21 +1176,6 @@ void bes2600_mcast_timeout(struct timer_list *t)
 		bes2600_bh_wakeup(cw12xx_vifpriv_to_hwpriv(priv));
 	spin_unlock_bh(&priv->ps_state_lock);
 }
-#else
-void bes2600_mcast_timeout(unsigned long arg)
-{
-	struct bes2600_vif *priv = (struct bes2600_vif *)arg;
-
-	wiphy_warn(priv->hw->wiphy,
-		"Multicast delivery timeout.\n");
-	spin_lock_bh(&priv->ps_state_lock);
-	priv->tx_multicast = priv->aid0_bit_set &&
-			priv->buffered_multicasts;
-	if (priv->tx_multicast)
-		bes2600_bh_wakeup(cw12xx_vifpriv_to_hwpriv(priv));
-	spin_unlock_bh(&priv->ps_state_lock);
-}
-#endif
 
 int bes2600_ampdu_action(struct ieee80211_hw *hw,
 			struct ieee80211_vif *vif,
@@ -1313,17 +1265,9 @@ static int bes2600_upload_beacon(struct bes2600_vif *priv)
 	u32 ies_len;
 
 	if (priv->vif->p2p ||
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,7,0)
 			hw_priv->channel->band == NL80211_BAND_5GHZ)
-#else
-			hw_priv->channel->band == IEEE80211_BAND_5GHZ)
-#endif
 		frame.rate = WSM_TRANSMIT_RATE_6;
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,3,0)
 	frame.skb = ieee80211_beacon_get(priv->hw, priv->vif, 0);
-#else
-	frame.skb = ieee80211_beacon_get(priv->hw, priv->vif);
-#endif
 	if (WARN_ON(!frame.skb))
 		return -ENOMEM;
 
@@ -1491,13 +1435,7 @@ static int bes2600_upload_null(struct bes2600_vif *priv)
 		.rate = 0xFF,
 	};
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,3,0))
 	frame.skb = ieee80211_nullfunc_get(priv->hw, priv->vif, 0, false);
-#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0))
-	frame.skb = ieee80211_nullfunc_get(priv->hw, priv->vif, false);
-#else
-	frame.skb = ieee80211_nullfunc_get(priv->hw, priv->vif);
-#endif
 	if (WARN_ON(!frame.skb))
 		return -ENOMEM;
 
@@ -1518,13 +1456,7 @@ static int bes2600_upload_qosnull(struct bes2600_vif *priv)
 		.rate = 0xFF,
 	};
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,3,0))
 	frame.skb = ieee80211_nullfunc_get(priv->hw, priv->vif, 0, false);
-#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0))
-	frame.skb = ieee80211_nullfunc_get(priv->hw, priv->vif, true);
-#else
-	frame.skb = ieee80211_nullfunc_get(priv->hw, priv->vif);
-#endif
 
 	if (WARN_ON(!frame.skb))
 		return -ENOMEM;
@@ -1598,11 +1530,7 @@ static int bes2600_start_ap(struct bes2600_vif *priv)
 		.mode = priv->vif->p2p ?
 				WSM_START_MODE_P2P_GO : WSM_START_MODE_AP,
 		/* TODO:COMBO:Change once mac80211 support is available */
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,7,0)
 		.band = (hw_priv->channel->band == NL80211_BAND_5GHZ) ?
-#else
-		.band = (hw_priv->channel->band == IEEE80211_BAND_5GHZ) ?
-#endif
 				WSM_PHY_BAND_5G : WSM_PHY_BAND_2_4G,
 		.channelNumber = hw_priv->channel->hw_value,
 		.beaconInterval = conf->beacon_int,
@@ -1644,11 +1572,7 @@ static int bes2600_start_ap(struct bes2600_vif *priv)
 
 #ifndef HIDDEN_SSID
 	/* Get SSID */
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,3,0)
 	skb = ieee80211_beacon_get(priv->hw, priv->vif, 0);
-#else
-	skb = ieee80211_beacon_get(priv->hw, priv->vif);
-#endif
 	if (WARN_ON(!skb))
 		return -ENOMEM;
 
@@ -1998,11 +1922,8 @@ void bes2600_ht_info_update_work(struct work_struct *work)
                 .what = WSM_UPDATE_IE_BEACON,
                 .count = 1,
         };
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,3,0)
-		skb = ieee80211_beacon_get(priv->hw, priv->vif, 0);
-#else
-		skb = ieee80211_beacon_get(priv->hw, priv->vif);
-#endif
+
+	skb = ieee80211_beacon_get(priv->hw, priv->vif, 0);
 	if (WARN_ON(!skb))
 		return;
 

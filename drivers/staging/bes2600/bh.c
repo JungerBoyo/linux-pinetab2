@@ -1404,7 +1404,6 @@ void bes2600_bh_dec_pending_count(struct bes2600_common *hw_priv, int idx)
 	}
 }
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,15,0)
 void bes2600_bh_mcu_active_monitor(struct timer_list* t)
 {
 	struct bes2600_common *hw_priv = from_timer(hw_priv, t, mcu_mon_timer);
@@ -1413,18 +1412,7 @@ void bes2600_bh_mcu_active_monitor(struct timer_list* t)
 				hw_priv->hw_bufs_used, hw_priv->wsm_tx_pending[1]);
 	bes2600_chrdev_wifi_force_close(hw_priv, true);
 }
-#else
-void bes2600_bh_mcu_active_monitor(unsigned long data)
-{
-	struct bes2600_common *hw_priv = (struct bes2600_common *)data;
 
-	bes2600_err(BES2600_DBG_TXRX, "link break between mcu and host, hw_buf_used:%d pending:%d\n", 
-				hw_priv->hw_bufs_used, hw_priv->wsm_tx_pending[1]);
-	bes2600_chrdev_wifi_force_close(hw_priv, true);
-}
-#endif
-
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,15,0)
 void bes2600_bh_lmac_active_monitor(struct timer_list* t)
 {
 	struct bes2600_common *hw_priv = from_timer(hw_priv, t, lmac_mon_timer);
@@ -1433,17 +1421,6 @@ void bes2600_bh_lmac_active_monitor(struct timer_list* t)
 				hw_priv->hw_bufs_used, hw_priv->wsm_tx_pending[0]);
 	bes2600_chrdev_wifi_force_close(hw_priv, true);
 }
-#else
-void bes2600_bh_lmac_active_monitor(unsigned long data)
-{
-	struct bes2600_common *hw_priv = (struct bes2600_common *)data;
-
-	bes2600_err(BES2600_DBG_TXRX, "link break between lmac and host, hw_buf_used:%d pending:%d\n", 
-				hw_priv->hw_bufs_used, hw_priv->wsm_tx_pending[0]);
-	bes2600_chrdev_wifi_force_close(hw_priv, true);
-}
-#endif
-
 
 #define BH_RX_CONT_LIMIT	3
 #define BH_TX_CONT_LIMIT	20

@@ -683,9 +683,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_set_country_code,
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 
     },
 	#if 0
@@ -696,9 +694,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_cfgvendor_gscan_get_capabilities
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 	},
 	{
 		{
@@ -707,9 +703,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_cfgvendor_set_scan_cfg
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 	},
 	{
 		{
@@ -718,9 +712,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_cfgvendor_set_batch_scan_cfg
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 	},
 	{
 		{
@@ -729,9 +721,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_cfgvendor_initiate_gscan
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 	},
 	{
 		{
@@ -740,9 +730,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_cfgvendor_enable_full_scan_result
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 	},
 	{
 		{
@@ -751,9 +739,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_cfgvendor_hotlist_cfg
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 	},
 	{
 		{
@@ -762,9 +748,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_cfgvendor_significant_change_cfg
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 	},
 	{
 		{
@@ -773,9 +757,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_cfgvendor_gscan_get_batch_results
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 	},
 	{
 		{
@@ -784,9 +766,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_cfgvendor_gscan_get_channel_list
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 	},
 	{
 		{
@@ -795,9 +775,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_cfgvendor_rtt_set_config
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 	},
 	{
 		{
@@ -806,9 +784,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_cfgvendor_rtt_cancel_config
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 	},
 	{
 		{
@@ -817,9 +793,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_cfgvendor_rtt_get_capability
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 	},
 	{
 		{
@@ -828,9 +802,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_cfgvendor_lstats_get_info
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 	},
 	{
 		{
@@ -839,9 +811,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_cfgvendor_lstats_set_info
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 	},
 	{
 		{
@@ -850,9 +820,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_cfgvendor_lstats_clear_info
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 	},
     {
         {
@@ -861,9 +829,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
         },
         .flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
         .doit = bes2600_cfgvendor_set_rssi_monitor
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
     },
 	{
 		{
@@ -872,9 +838,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_cfgvendor_logger_start_logging
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 	},
 	{
 		{
@@ -883,9 +847,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_cfgvendor_logger_get_feature
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 	},
 	{
 		{
@@ -894,9 +856,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_cfgvendor_logger_get_version
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 	},
 	{
 		{
@@ -905,9 +865,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_cfgvendor_logger_get_ring_status
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 	},
 	{
 		{
@@ -916,9 +874,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_cfgvendor_logger_get_ring_data
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 	},
 	{
 		{
@@ -927,9 +883,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_cfgvendor_logger_get_firmware_memory_dump
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 	},
 	{
 		{
@@ -938,9 +892,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_cfgvendor_logger_start_pkt_fate_monitoring
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 	},
 	{
 		{
@@ -949,9 +901,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_cfgvendor_logger_get_tx_pkt_fates
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 	},
 	{
 		{
@@ -960,9 +910,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_cfgvendor_logger_get_rx_pkt_fates
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 	},
 	{
 		{
@@ -971,9 +919,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_cfgvendor_set_rand_mac_oui
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 	},
 	{
 		{
@@ -982,9 +928,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_cfgvendor_set_nodfs_flag
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 
 	},
 	{
@@ -994,9 +938,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_cfgvendor_set_nd_offload
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 	},
 	{
 		{
@@ -1005,9 +947,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_cfgvendor_get_feature_set
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 	},
 	{
 		{
@@ -1016,9 +956,7 @@ static const struct wiphy_vendor_command bes2600_own_commands[] = {
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = bes2600_cfgvendor_get_feature_set_matrix
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0))
 		.policy = VENDOR_CMD_RAW_DATA,
-#endif
 	}
 	#endif
 };
