@@ -147,8 +147,6 @@ static struct ieee80211_channel bes2600_2ghz_chantable[] = {
 	CHAN2G(14, 2484, 0),
 };
 
-#ifdef CONFIG_BES2600_5GHZ_SUPPORT
-#if 0
 static struct ieee80211_channel bes2600_5ghz_chantable[] = {
 	CHAN5G(34, 0),		CHAN5G(36, 0),
 	CHAN5G(38, 0),		CHAN5G(40, 0),
@@ -170,25 +168,6 @@ static struct ieee80211_channel bes2600_5ghz_chantable[] = {
 	CHAN5G(208, 0),		CHAN5G(212, 0),
 	CHAN5G(216, 0),
 };
-#else
-/* comply with china regulation on 5G */
-static struct ieee80211_channel bes2600_5ghz_chantable[] = {
-	CHAN5G(36, 0),
-	CHAN5G(40, 0),
-	CHAN5G(44, 0),
-	CHAN5G(48, 0),
-	CHAN5G(52, 0),
-	CHAN5G(56, 0),
-	CHAN5G(60, 0),
-	CHAN5G(64, 0),
-	CHAN5G(149, 0),
-	CHAN5G(153, 0),
-	CHAN5G(157, 0),
-	CHAN5G(161, 0),
-	CHAN5G(165, 0),
-};
-#endif
-#endif
 
 static struct ieee80211_supported_band bes2600_band_2ghz = {
 	.channels = bes2600_2ghz_chantable,
@@ -213,7 +192,6 @@ static struct ieee80211_supported_band bes2600_band_2ghz = {
 	},
 };
 
-#ifdef CONFIG_BES2600_5GHZ_SUPPORT
 static struct ieee80211_supported_band bes2600_band_5ghz = {
 	.channels = bes2600_5ghz_chantable,
 	.n_channels = ARRAY_SIZE(bes2600_5ghz_chantable),
@@ -236,7 +214,6 @@ static struct ieee80211_supported_band bes2600_band_5ghz = {
 		},
 	},
 };
-#endif /* CONFIG_BES2600_5GHZ_SUPPORT */
 
 static const unsigned long bes2600_ttl[] = {
 	1 * HZ,	/* VO */
@@ -506,9 +483,7 @@ struct ieee80211_hw *bes2600_init_common(size_t hw_priv_data_len)
 	hw->vif_data_size = sizeof(struct bes2600_vif);
 
 	hw->wiphy->bands[NL80211_BAND_2GHZ] = &bes2600_band_2ghz;
-#ifdef CONFIG_BES2600_5GHZ_SUPPORT
 	hw->wiphy->bands[NL80211_BAND_5GHZ] = &bes2600_band_5ghz;
-#endif /* CONFIG_BES2600_5GHZ_SUPPORT */
 
 	/* Channel params have to be cleared before registering wiphy again */
 	for (band = 0; band < NUM_NL80211_BANDS; band++) {

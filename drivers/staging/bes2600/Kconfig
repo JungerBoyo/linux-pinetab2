@@ -42,13 +42,6 @@ config BES2600_USE_GPIO_IRQ
 		Say Y here if you want to include GPIO IRQ support instead of SDIO IRQ.
 		If unsure, say N.
 
-config BES2600_5GHZ_SUPPORT
-	bool "5GHz band support"
-	default y
-	help
-		Say Y if your device supports 5GHz band.
-		If unsure, say N.
-
 config BES2600_WAPI_SUPPORT
 	bool "WAPI support"
 	default n

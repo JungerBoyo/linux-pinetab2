@@ -356,9 +356,7 @@ static ssize_t bes2600_11n_write(struct file *file,
 		ena = 1;
 
 	band[0]->ht_cap.ht_supported = ena;
-#ifdef CONFIG_BES2600_5GHZ_SUPPORT
 	band[1]->ht_cap.ht_supported = ena;
-#endif /* CONFIG_BES2600_5GHZ_SUPPORT */
 
 	return count;
 }
