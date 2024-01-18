@@ -2090,7 +2090,6 @@ static void bes2600_sdio_disconnect(struct sdio_func *func)
 	bes2600_info(BES2600_DBG_SDIO, "%s called:%p,%d\n", __func__, func, func->num);
 
 	if (self) {
-		bes2600_unregister_net_dev(self);
 #ifndef CONFIG_BES2600_USE_GPIO_IRQ
 		sdio_claim_host(func);
 		sdio_release_irq(func);
@@ -2454,6 +2453,7 @@ static void __exit bes2600_sdio_exit(void)
 	struct sbus_priv *priv =  bes2600_chrdev_get_sbus_priv_data();
 	bes2600_info(BES2600_DBG_SDIO, "%s called\n", __func__);
 
+	bes2600_unregister_net_dev(priv);
 	sdio_unregister_driver(&sdio_driver);
 	bes2600_chrdev_free();
 	if(!priv) {
