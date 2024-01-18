@@ -72,7 +72,7 @@ ccflags-y += -DVENDOR_XM_KEEPALIVE
 endif
 endif
 
-BES2600_DRV_VERSION := bes2600_0.3.5_2023.0209
+BES2600_DRV_VERSION := bes2600_0.3.5_2024.0116
 
 ifeq ($(GET_MAC_ADDR_METHOD)_$(PLAT_ROCKCHIP),1_n)
  $(error Parameter setting error, GET_MAC_ADDR_METHOD can only be set to 1 on rockchip platform)
