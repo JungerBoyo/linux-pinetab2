@@ -7,7 +7,7 @@ CONFIG_BES2600_WLAN_SPI                 ?= n
 CONFIG_BES2600_WLAN_USB                 ?= n
 
 CONFIG_BES2600_VENDOR_CMD               ?= y
-CONFIG_BES2600_TESTMODE                 ?= y
+CONFIG_BES2600_TESTMODE                 ?= n
 
 CONFIG_BES2600_WAPI_SUPPORT             ?= n
 CONFIG_BES2600_STA_DEBUG                ?= y
