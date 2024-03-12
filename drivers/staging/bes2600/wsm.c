@@ -370,7 +370,7 @@ struct wsm_sleep_ctrl {
 	u32 disable;
 };
 
-int wsm_sleep_ctrl(struct bes2600_common *hw_priv, u32 disable, int if_id)
+static __maybe_unused int wsm_sleep_ctrl(struct bes2600_common *hw_priv, u32 disable, int if_id)
 {
 	int ret;
 	struct wsm_buf *buf = &hw_priv->wsm_cmd_buf;
@@ -2181,7 +2181,7 @@ underflow:
 }
 EXPORT_SYMBOL(wsm_handle_exception);
 
-int wsm_bt_ts_request(struct bes2600_common *hw_priv, struct wsm_buf *buf)
+static int wsm_bt_ts_request(struct bes2600_common *hw_priv, struct wsm_buf *buf)
 {
 #ifdef WIFI_BT_COEXIST_EPTA_ENABLE
 	uint32_t type;

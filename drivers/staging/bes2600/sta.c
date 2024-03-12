@@ -1731,7 +1731,7 @@ void bes2600_device_power_calc(struct bes2600_common *hw_priv,
 * This function is called to Parse the SDD file
  *to extract listen_interval and PTA related information
 */
-int bes2600_parse_SDD_file(struct bes2600_common *hw_priv)
+static __maybe_unused int bes2600_parse_SDD_file(struct bes2600_common *hw_priv)
 {
 	u8 *sdd_data = (u8 *)hw_priv->sdd->data;
 #ifdef CONFIG_BES2600_TESTMODE
@@ -2043,7 +2043,7 @@ int bes2600_setup_mac(struct bes2600_common *hw_priv)
 	return 0;
 }
 
-void bes2600_pending_offchanneltx_work(struct work_struct *work)
+static void bes2600_pending_offchanneltx_work(struct work_struct *work)
 {
 	struct bes2600_vif *priv =
 	container_of(work, struct bes2600_vif, pending_offchanneltx_work.work);

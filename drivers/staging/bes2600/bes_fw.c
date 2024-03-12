@@ -23,6 +23,8 @@
 #include "bes_firmware.h"
 #endif
 
+int bes2600_load_firmware_sdio(struct sbus_ops *ops, struct sbus_priv *priv);
+
 struct platform_fw_t {
 	struct delayed_work work_data;
 	struct sdio_func *func;
@@ -101,7 +103,7 @@ test_read_tx:
 	return ret;
 }
 
-int bes_host_slave_sync(struct bes2600_common *hw_priv)
+static int __maybe_unused bes_host_slave_sync(struct bes2600_common *hw_priv)
 {
 	u8 val;
 	int ret;
@@ -444,7 +446,7 @@ err1:
 	return ret;
 }
 
-int bes_firmware_download(struct platform_fw_t *fw_data, const char *fw_name, bool auto_run)
+static int bes_firmware_download(struct platform_fw_t *fw_data, const char *fw_name, bool auto_run)
 {
 	u8 frame_num = 0;
 	u8 last_frame_num = 0;
