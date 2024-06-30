@@ -1518,7 +1518,45 @@ static bool vop2_crtc_mode_fixup(struct drm_crtc *crtc,
 	return true;
 }
 
+static void vop2_crtc_disable_lut(struct vop2_video_port *vp, u32* dsp_ctrl)
+{
+	*dsp_ctrl = vop2_vp_read(vp, RK3568_VP_DSP_CTRL);
+	*dsp_ctrl &= ~RK3568_VP_DSP_CTRL__DSP_LUT_EN;
+	vop2_vp_write(vp, RK3568_VP_DSP_CTRL, *dsp_ctrl);
+
+#define vop2_vp_read_dsp_lut_en_bit(name) (u32)(vop2_vp_read(vp, name) & RK3568_VP_DSP_CTRL__DSP_LUT_EN)
+	readx_poll_timeout(vop2_vp_read_dsp_lut_en_bit, RK3568_VP_DSP_CTRL, *dsp_ctrl, !*dsp_ctrl, 5, 33333);
+#undef vop2_vp_read_dsp_lut_en_bit
+}
+
+static void vop2_crtc_enable_lut(struct vop2_video_port *vp, u32* dsp_ctrl)
+{
+	*dsp_ctrl |= RK3568_VP_DSP_CTRL__DSP_LUT_EN;
+	vop2_vp_write(vp, RK3568_VP_DSP_CTRL, *dsp_ctrl);
+}
+
 static void vop2_crtc_load_lut(struct drm_crtc *crtc)
+{
+	struct vop2_video_port *vp = to_vop2_video_port(crtc);
+	struct vop2 *vop2 = vp->vop2;
+	int i = 0;
+
+	if (vop2->enable_count == 0 || !vp->lut || !vop2->lut_regs)
+		return;
+
+	if (WARN_ON(!drm_modeset_is_locked(&crtc->mutex)))
+		return;
+
+	for (i = 0; i < vp->gamma_lut_len; i++)
+		vop2_write_lut(vop2, i << 2, vp->lut[i]);
+
+	vop2_vp_write(vp, RK3568_LUT_PORT_SEL, vp->id);
+
+	vp->gamma_lut_active = true;
+}
+
+
+static void vop2_crtc_load_lut_legacy(struct drm_crtc *crtc)
 {
 	struct vop2_video_port *vp = to_vop2_video_port(crtc);
 	struct vop2 *vop2 = vp->vop2;
@@ -1533,28 +1571,18 @@ static void vop2_crtc_load_lut(struct drm_crtc *crtc)
 
 	vop2_lock(vop2);
 
-	dsp_ctrl = vop2_vp_read(vp, RK3568_VP_DSP_CTRL);
-	dsp_ctrl &= ~RK3568_VP_DSP_CTRL__DSP_LUT_EN;
-	vop2_vp_write(vp, RK3568_VP_DSP_CTRL, dsp_ctrl);
-
-	vop2_cfg_done(vp);
-	vop2_unlock(vop2);
-
-#define vop2_vp_read_dsp_lut_en_bit(name) (u32)(vop2_vp_read(vp, name) & RK3568_VP_DSP_CTRL__DSP_LUT_EN)
-	readx_poll_timeout(vop2_vp_read_dsp_lut_en_bit, RK3568_VP_DSP_CTRL, dsp_ctrl, !dsp_ctrl, 5, 33333);
-#undef vop2_vp_read_dsp_lut_en_bit
+	vop2_crtc_disable_lut(vp, &dsp_ctrl);
 
 	for (i = 0; i < vp->gamma_lut_len; i++)
 		vop2_write_lut(vop2, i << 2, vp->lut[i]);
 
-	vop2_lock(vop2);
-
-	dsp_ctrl |= RK3568_VP_DSP_CTRL__DSP_LUT_EN;
-	vop2_vp_write(vp, RK3568_VP_DSP_CTRL, dsp_ctrl);
 	vop2_vp_write(vp, RK3568_LUT_PORT_SEL, vp->id);
 
-	vop2_cfg_done(vp);
 	vp->gamma_lut_active = true;
+
+	vop2_cfg_done(vp);
+
+	vop2_crtc_enable_lut(vp, &dsp_ctrl);
 
 	vop2_unlock(vop2);
 }
@@ -1611,7 +1639,7 @@ static int vop2_crtc_legacy_gamma_set(struct drm_crtc *crtc, u16 *red,
 	for (i = 0; i < size; i++)
 		rockchip_vop2_crtc_fb_gamma_set(crtc, red[i], green[i],
 						blue[i], i);
-	vop2_crtc_load_lut(crtc);
+	vop2_crtc_load_lut_legacy(crtc);
 
 	return 0;
 }
@@ -1626,6 +1654,7 @@ static int vop2_crtc_atomic_gamma_set(struct drm_crtc *crtc,
 	for (i = 0; i < vp->gamma_lut_len; i++)
 		rockchip_vop2_crtc_fb_gamma_set(crtc, lut[i].red, lut[i].green,
 						lut[i].blue, i);
+
 	vop2_crtc_load_lut(crtc);
 
 	return 0;
@@ -2117,11 +2146,10 @@ static void vop2_crtc_atomic_enable(struct drm_crtc *crtc,
 
 	vop2_crtc_enable_irq(vp, VP_INT_POST_BUF_EMPTY);
 
-	/*
-	 * restore the lut table.
-	 */
-	if (vp->gamma_lut_active)
+	if (vp->gamma_lut_active) {
+		dsp_ctrl |= RK3568_VP_DSP_CTRL__DSP_LUT_EN;
 		vop2_crtc_load_lut(crtc);
+	}
 
 	polflags = 0;
 	if (vcstate->bus_flags & DRM_BUS_FLAG_PIXDATA_DRIVE_NEGEDGE)
@@ -2643,18 +2671,32 @@ static void vop2_crtc_atomic_flush(struct drm_crtc *crtc,
 				   struct drm_atomic_state *state)
 {
 	struct vop2_video_port *vp = to_vop2_video_port(crtc);
-
-	vop2_post_config(crtc);
-
-	vop2_cfg_done(vp);
+	struct vop2 *vop2 = vp->vop2;
+	u32 dsp_ctrl = 0;
 
 	if (crtc->state->color_mgmt_changed || crtc->state->active_changed) {
 		if (crtc->state->gamma_lut || vp->gamma_lut) {
+			vop2_lock(vop2);
+			vop2_crtc_disable_lut(vp, &dsp_ctrl);
+
 			if (crtc->state->gamma_lut)
 				vp->gamma_lut = crtc->state->gamma_lut->data;
+
 			vop2_crtc_atomic_gamma_set(crtc, crtc->state);
+
+			vop2_post_config(crtc);
+			vop2_cfg_done(vp);
+
+			vop2_crtc_enable_lut(vp, &dsp_ctrl);
+
+			vop2_unlock(vop2);
 		}
+	} else {
+		vop2_post_config(crtc);
+		vop2_cfg_done(vp);
 	}
+
+
 
 	spin_lock_irq(&crtc->dev->event_lock);
 
@@ -3395,7 +3437,7 @@ static int vop2_bind(struct device *dev, struct device *master, void *data)
 	if (ret)
 		return ret;
 
-    ret = vop2_gamma_init(vop2);
+	ret = vop2_gamma_init(vop2);
 	if (ret)
 		return ret;
 
