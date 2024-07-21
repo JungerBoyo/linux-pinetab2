@@ -247,8 +247,10 @@
 
 	vcc_wl: vcc_wl {
 		compatible = "regulator-fixed";
+		enable-active-high;
 		pinctrl-names = "default";
 		pinctrl-0 = <&wifi_pwren>;
+		gpio = <&gpio0 RK_PA0 GPIO_ACTIVE_HIGH>;
 		regulator-name = "vcc_wl";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
